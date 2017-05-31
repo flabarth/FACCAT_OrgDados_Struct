@@ -91,31 +91,56 @@ void showAll(paciente p){
 	int pacienteSize = p.pacienteSize;
 	int fileSize;
 	int numeroRegistros;
+	int registrosLidosComSucesso = 0;
 	
 	FILE *fin;
-	fin = fopen("data.dat", "rb");
+	fin = fopen("data.dat", "rb"); // Abre arquivo de dados
 	
-	fseek(fin, 0L, SEEK_END);
-	fileSize = ftell(fin);
-	numeroRegistros = fileSize / pacienteSize;
+	fseek(fin, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
+	fileSize = ftell(fin); // Tamanho total do arquivo
+	numeroRegistros = fileSize / pacienteSize; // Número de registros (tamanho total / tamanho do registro)
 	
-	rewind(fin);
-
-	printf("-------------------------------------------------------------------------\n");
-	printf("|%-2s|%-5s|%-13s|%-6s|%-20s|%-20s|\n", "E", "ID", "Nome", "Idade", "Diagnóstico", "Tratamento");
-	printf("-------------------------------------------------------------------------\n");
-	for(int x = 0; x < numeroRegistros; x++){
-		int ativo = readi(p.ativo, fin);
-		if(ativo == 1){	
-			printf("|%-2d|", ativo);
-			printf("%-5d|", readi(p.id, fin));
-			printf("%-13s|", reads(p.nome, 45, fin));
-			printf("%-6d|", readi(p.idade, fin));
-			printf("%-20s|", reads(p.diagnostico, 200, fin));
-			printf("%-20s|\n", reads(p.tratamento, 200, fin));
+	rewind(fin); // Volta ao início do arquivo
+	
+	if(numeroRegistros > 0){
+		
+		printf("----------------------------------------------------------------------\n");
+		printf("|%-5s|%-13s|%-6s|%-20s|%-20s|\n", "ID", "Nome", "Idade", "Diagnóstico", "Tratamento");
+		printf("----------------------------------------------------------------------\n");
+		
+		for(int x = 1; x <= numeroRegistros; x++){
+			
+			int ativo = readi(p.ativo, fin); // Captura estado do registro (ativo ou não)
+			
+			if(ativo == 1){ // Se for ativo, lê e mostra na tela
+			
+				printf("|%-5d|", readi(p.id, fin));
+				printf("%-13s|", reads(p.nome, 45, fin));
+				printf("%-6d|", readi(p.idade, fin));
+				printf("%-20s|", reads(p.diagnostico, 200, fin));
+				printf("%-20s|\n", reads(p.tratamento, 200, fin));
+				
+				registrosLidosComSucesso++;
+				
+			}else{ // Se não for ativo...
+			
+				// Valor que avançaremos o ponteiro. Tamanho do registo menos o tamanho de ativo (pois já foi lido)
+				int valorParaAvancar = pacienteSize - sizeof(ativo);
+				
+				// Avança da posição atual + valor para avançar (avança um registro)
+				fseek(fin, valorParaAvancar, SEEK_CUR); // Move ponteiro para depois do valor apagado
+				
+			}
+			
 		}
+		
+		printf("----------------------------------------------------------------------\n");
+		
+	}else{
+		
+		printf("\nNenhum registro!\n");
+		
 	}
-	printf("-------------------------------------------------------------------------\n");
 	
 	fclose(fin);
 	
