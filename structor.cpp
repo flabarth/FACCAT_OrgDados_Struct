@@ -6,6 +6,7 @@
 
 int main(){
 	
+	srand(time(NULL));
 	setlocale(LC_ALL,"");
 	
 	char escolha;
@@ -16,6 +17,7 @@ int main(){
 	printf("===== BEM-VINDO AO SISTEMA STRUCTOR =====\n");
 	
 	do{
+		
 		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\ne[x]cluir\n[s]air\n>> ");
 		
 		escolha = getchar();
