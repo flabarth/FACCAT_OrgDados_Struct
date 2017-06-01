@@ -116,7 +116,7 @@ void insertNew(paciente p){
 		p.setId(randomID()); // Define ID aleatório (sem repetir)
 		
 		printf("Nome > ");
-		scanf("%s", nome);
+		scanf("%44[^\n]", nome);
 		p.setNome(nome);
 		
 		printf("Idade > ");
@@ -126,11 +126,13 @@ void insertNew(paciente p){
 		getchar();
 		
 		printf("Diagnóstico > ");
-		scanf("%s", diagnostico);
+		scanf("%199[^\n]", diagnostico);
 		p.setDiagnostico(diagnostico);
 		
+		getchar();
+		
 		printf("Tratamento > ");
-		scanf("%s", tratamento);
+		scanf("%199[^\n]", tratamento);
 		p.setTratamento(tratamento);
 
 		fwrite(&p, sizeof(struct paciente), 1, fout); // Escreve toda a estrutura no arquivo
@@ -148,6 +150,7 @@ void insertNew(paciente p){
 	
 }
 
+// Lista registros existentes
 void showAll(paciente p){
 	
 	int pacienteSize = sizeof(struct paciente);
@@ -166,9 +169,9 @@ void showAll(paciente p){
 	
 	if(numeroRegistros > 0){
 		
-		printf("----------------------------------------------------------------------\n");
-		printf("|%-5s|%-13s|%-6s|%-20s|%-20s|\n", "ID", "Nome", "Idade", "Diagnóstico", "Tratamento");
-		printf("----------------------------------------------------------------------\n");
+		printf("----------------------------------------------------------------------------\n");
+		printf("|%-5s|%-15s|%-6s|%-22s|%-22s|\n", "ID", "Nome", "Idade", "Diagnóstico", "Tratamento");
+		printf("----------------------------------------------------------------------------\n");
 		
 		for(int x = 1; x <= numeroRegistros; x++){
 			
@@ -187,10 +190,10 @@ void showAll(paciente p){
 				fread(&p, sizeof(struct paciente), 1, fin); // Lê registro inteiro
 				
 				printf("|%-5d|", p.id);
-				printf("%-13s|", p.nome);
+				printf("%-15s|", p.nome);
 				printf("%-6d|", p.idade);
-				printf("%-20s|", p.diagnostico);
-				printf("%-20s|\n", p.tratamento);
+				printf("%-22s|", p.diagnostico);
+				printf("%-22s|\n", p.tratamento);
 				
 				registrosLidosComSucesso++;
 				
@@ -202,7 +205,7 @@ void showAll(paciente p){
 			
 		}
 		
-		printf("----------------------------------------------------------------------\n");
+		printf("----------------------------------------------------------------------------\n");
 		
 	}else{
 		
