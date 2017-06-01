@@ -96,14 +96,14 @@ int randomID(){
 }
 
 // Média de idade dos pacientes ativos
-float mediaIdade(paciente p){
+float mediaIdade(paciente p, char *database){
 	int pacienteSize = sizeof(struct paciente);
 	int fileSize;
 	int numeroRegistros;
 	int total = 0;
 	int registrosAtivos = 0;
 	FILE *fin;
-	fin = fopen("data.dat", "rb"); // Abre arquivo de dados
+	fin = fopen(database, "rb"); // Abre arquivo de dados
 	
 	fseek(fin, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
 	fileSize = ftell(fin); // Tamanho total do arquivo
@@ -133,7 +133,7 @@ float mediaIdade(paciente p){
 }
 
 // Insere novo registro (com interface)
-void insertNew(paciente p){
+void insertNew(paciente p, char *database){
 	
 	char escolha = 's';
 	int id;
@@ -143,7 +143,7 @@ void insertNew(paciente p){
 	char tratamento[200];
 	
 	FILE *fout;
-	fout = fopen("data.dat", "ab");
+	fout = fopen(database, "ab");
 	fseek(fout, 0, SEEK_END);
 	
 	do{
@@ -190,7 +190,7 @@ void insertNew(paciente p){
 }
 
 // Lista registros existentes
-void showAll(paciente p){
+void showAll(paciente p, char *database){
 	
 	int pacienteSize = sizeof(struct paciente);
 	int fileSize;
@@ -198,7 +198,7 @@ void showAll(paciente p){
 	int registrosLidosComSucesso = 0;
 	
 	FILE *fin;
-	fin = fopen("data.dat", "rb"); // Abre arquivo de dados
+	fin = fopen(database, "rb"); // Abre arquivo de dados
 	
 	fseek(fin, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
 	fileSize = ftell(fin); // Tamanho total do arquivo
@@ -257,10 +257,10 @@ void showAll(paciente p){
 }
 
 // Deleta um registro baseado no ID
-void deleteReg(paciente p){
+void deleteReg(paciente p, char *database){
 	
 	FILE *f;
-	f = fopen("data.dat", "r+b"); // Abre arquivo de dados
+	f = fopen(database, "r+b"); // Abre arquivo de dados
 	int pacienteSize = sizeof(struct paciente);
 	int fileSize;
 	int numeroRegistros;
@@ -310,10 +310,10 @@ void deleteReg(paciente p){
 	
 }
 
-void getRegById(paciente p){
+void getRegById(paciente p, char *database){
 	
 	FILE *f;
-	f = fopen("data.dat", "r+b"); // Abre arquivo de dados
+	f = fopen(database, "r+b"); // Abre arquivo de dados
 	int pacienteSize = sizeof(struct paciente);
 	int fileSize;
 	int numeroRegistros;
