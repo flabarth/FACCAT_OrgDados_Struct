@@ -10,11 +10,17 @@ int main(){
 	setlocale(LC_ALL,"");
 	
 	char escolha;
+	char database[20];
 
 	paciente pW; // Variável de escrita
 	paciente pR; // Variável de leitura
 	
 	printf("===== BEM-VINDO AO SISTEMA STRUCTOR =====\n");
+	
+	printf("Digite o nome da base de dados desejada (sem espaços e extensão).\n>> ");
+	scanf("%s", database);
+	getchar();
+	strcat(database, ".dat");
 	
 	do{
 		
@@ -24,19 +30,19 @@ int main(){
 		getchar(); // Char sobrando
 		switch(escolha){
 			case 'i': // inserir
-				insertNew(pW);
+				insertNew(pW, database);
 				break;
 			case 'l': // listar
-				showAll(pR);
+				showAll(pR, database);
 				break;
 			case 'c': // consulta por id
-				getRegById(pR);
+				getRegById(pR, database);
 				break;
 			case 'x': // excluir
-				deleteReg(pW);
+				deleteReg(pW, database);
 				break;
 			case 'm': // média
-				printf("\nA média de idade de todos os pacientes é: %.2f \n", mediaIdade(pR));
+				printf("\nA média de idade de todos os pacientes é: %.2f \n", mediaIdade(pR, database));
 				break;
 			case 's': // sair
 				break;
