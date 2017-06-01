@@ -119,6 +119,8 @@ void insertNew(paciente p){
 		scanf("%44[^\n]", nome);
 		p.setNome(nome);
 		
+		getchar();
+		
 		printf("Idade > ");
 		scanf("%d", &idade);
 		p.setIdade(idade);
@@ -235,6 +237,7 @@ void deleteReg(paciente p){
 	
 	printf("Digite o ID do paciente que deseja excluir > ");
 	scanf("%d", &idEx);
+	getchar();
 	
 	for(int x = 1; x <= numeroRegistros; x++){ // Percorre todos os registros até encontrar o desejado
 		
