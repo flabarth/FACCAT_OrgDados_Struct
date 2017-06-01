@@ -309,3 +309,69 @@ void deleteReg(paciente p){
 	fclose(f); // Fecha arquivo
 	
 }
+
+void getRegById(paciente p){
+	
+	FILE *f;
+	f = fopen("data.dat", "r+b"); // Abre arquivo de dados
+	int pacienteSize = sizeof(struct paciente);
+	int fileSize;
+	int numeroRegistros;
+	int idEx;
+	
+	fseek(f, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
+	fileSize = ftell(f); // Tamanho total do arquivo
+	numeroRegistros = fileSize / pacienteSize; // Número de registros (tamanho total / tamanho do registro)
+	
+	rewind(f); // Volta ao início do arquivo
+	
+	printf("Digite o ID do paciente que deseja consultar > ");
+	scanf("%d", &idEx);
+	getchar();
+	
+	for(int x = 1; x <= numeroRegistros; x++){ // Percorre todos os registros até encontrar o desejado
+		
+		// Aqui lemos o campo ativo, e só lemos o campo id também se o registro for ativo.
+		// No fim, não lemos o registro inteiro, apenas ativo e id (se for ativo).
+		
+		int ativo = readi(p.ativo, f); // Captura APENAS estado do registro (ativo ou não)
+		
+		if(ativo == 1){ // Se for ativo...
+		
+			int idCons = readi(p.id, f); // Captura ID do registro percorrido
+			
+			if(idCons == idEx){ // Testa se é igual ao ID desejado
+				// Se for...
+				
+				fseek(f, -(sizeof(ativo) + sizeof(idCons)), SEEK_CUR); // Volta para início do registro encontrado
+				fread(&p, sizeof(struct paciente), 1, f); // Lê registro inteiro
+				printf("----------------------------------------------------------------------------\n");
+				printf("|%-5s|%-15s|%-6s|%-22s|%-22s|\n", "ID", "Nome", "Idade", "Diagnóstico", "Tratamento");
+				printf("----------------------------------------------------------------------------\n");
+				printf("|%-5d|", p.id);
+				printf("%-15s|", p.nome);
+				printf("%-6d|", p.idade);
+				printf("%-22s|", p.diagnostico);
+				printf("%-22s|\n", p.tratamento);
+				printf("----------------------------------------------------------------------------\n");
+				
+			}else{
+				// Se não for...
+				
+				int valorParaAvancar = pacienteSize - (sizeof(ativo) + sizeof(idCons));
+				fseek(f, valorParaAvancar, SEEK_CUR); // Avanca para próximo registro	
+				
+			}
+			
+		}else{ // Se não for ativo...
+			
+			fseek(f, -sizeof(ativo), SEEK_CUR); // Volta para inicio do registro
+			fseek(f, pacienteSize, SEEK_CUR); // Avança um registro
+			
+		}
+		
+	}
+	
+	fclose(f); // Fecha arquivo
+	
+}
