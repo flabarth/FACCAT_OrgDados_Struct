@@ -18,7 +18,7 @@ int main(){
 	
 	do{
 		
-		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\ne[x]cluir\n[m]édia de idade\n[s]air\n>> ");
+		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\n[c]onsultar\ne[x]cluir\n[m]édia de idade\n[s]air\n>> ");
 		
 		escolha = getchar();
 		getchar(); // Char sobrando
@@ -29,10 +29,13 @@ int main(){
 			case 'l': // listar
 				showAll(pR);
 				break;
+			case 'c': // consulta por id
+				getRegById(pR);
+				break;
 			case 'x': // excluir
 				deleteReg(pW);
 				break;
-			case 'm':
+			case 'm': // média
 				printf("\nA média de idade de todos os pacientes é: %.2f \n", mediaIdade(pR));
 				break;
 			case 's': // sair
