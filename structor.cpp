@@ -16,7 +16,7 @@ int main(){
 	printf("===== BEM-VINDO AO SISTEMA STRUCTOR =====\n");
 	
 	do{
-		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\n[s]air\n>> ");
+		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\ne[x]cluir\n[s]air\n>> ");
 		
 		escolha = getchar();
 		getchar(); // Char sobrando
@@ -26,6 +26,9 @@ int main(){
 				break;
 			case 'l': // listar
 				showAll(pR);
+				break;
+			case 'x': // excluir
+				deleteReg(pW);
 				break;
 			case 's': // sair
 				break;
