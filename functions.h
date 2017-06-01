@@ -95,6 +95,43 @@ int randomID(){
 	return r;
 }
 
+// Média de idade dos pacientes ativos
+float mediaIdade(paciente p){
+	int pacienteSize = sizeof(struct paciente);
+	int fileSize;
+	int numeroRegistros;
+	int total = 0;
+	int registrosAtivos = 0;
+	FILE *fin;
+	fin = fopen("data.dat", "rb"); // Abre arquivo de dados
+	
+	fseek(fin, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
+	fileSize = ftell(fin); // Tamanho total do arquivo
+	numeroRegistros = fileSize / pacienteSize; // Número de registros (tamanho total / tamanho do registro)
+	
+	rewind(fin); // Volta ao início do arquivo
+	
+	for(int x = 1; x <= numeroRegistros; x++){
+		int ativo = readi(p.ativo, fin); // Captura APENAS estado do registro (ativo ou não)
+		fseek(fin, -sizeof(ativo), SEEK_CUR); // Volta para inicio do registro
+			
+		if(ativo == 1){ // Se for ativo...
+			fread(&p, sizeof(struct paciente), 1, fin); // Lê registro inteiro
+			
+			total = total + p.idade;
+			
+			registrosAtivos++;
+							
+		}else{ // Se não for ativo...
+				
+			fseek(fin, pacienteSize, SEEK_CUR); // Avança um registro
+				
+		}
+	}
+	
+	return (float)total / (float)registrosAtivos;
+}
+
 // Insere novo registro (com interface)
 void insertNew(paciente p){
 	
