@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "paciente.h"
 
 // Escreve valor inteiro no arquivo de dados
@@ -26,6 +27,74 @@ char *reads(char *s, int sizeofstring, FILE *f){
 	return s;
 }
 
+// Retorna um ID randomizado que ainda não existe na base
+int randomID(){
+	int pacienteSize = sizeof(struct paciente);
+	int fileSize;
+	int numeroRegistros;
+	bool existe = false;
+	bool encontrou;
+	int r;
+	paciente p;
+	
+	FILE *fin;
+	fin = fopen("data.dat", "rb"); // Abre arquivo de dados
+	
+	fseek(fin, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
+	fileSize = ftell(fin); // Tamanho total do arquivo
+	numeroRegistros = fileSize / pacienteSize; // Número de registros (tamanho total / tamanho do registro)
+	
+	rewind(fin); // Volta ao início do arquivo
+	
+	if(numeroRegistros > 0){
+	
+		do{
+			
+			encontrou = false;
+			r = rand() % (999 + 1 - 0) + 0;
+		
+			for(int x = 1; x <= numeroRegistros; x++){
+			
+				int ativo = readi(p.ativo, fin); // Captura APENAS estado do registro (ativo ou não)
+		
+				if(ativo == 1){ // Se for ativo...
+		
+					int idCons = readi(p.id, fin); // Captura ID do registro percorrid
+					if(idCons == r){
+						encontrou = true;
+					}
+					
+					int valorParaAvancar = pacienteSize - (sizeof(ativo) + sizeof(idCons));
+					fseek(fin, valorParaAvancar, SEEK_CUR); // Avanca para próximo registro
+					
+				}else{ // Se não for ativo...
+			
+					fseek(fin, -sizeof(ativo), SEEK_CUR); // Volta para inicio do registro
+					fseek(fin, pacienteSize, SEEK_CUR); // Avança um registro
+					
+				}
+				
+			}
+			
+			if(encontrou == true){
+				existe == true;
+			}else{
+				existe == false;
+			}
+			
+		}while(existe == true);
+		
+	}else{
+		
+		return rand() % (999 + 1 - 0) + 0;
+		
+	}
+	
+	fclose(fin);
+	
+	return r;
+}
+
 // Insere novo registro (com interface)
 void insertNew(paciente p){
 	
@@ -42,13 +111,9 @@ void insertNew(paciente p){
 	
 	do{
 		
-		p.setAtivo(1);
+		p.setAtivo(1); // Define que é ativo (não excluído)
 		
-		printf("ID > ");
-		scanf("%d", &id);
-		p.setId(id);
-		
-		getchar();
+		p.setId(randomID()); // Define ID aleatório (sem repetir)
 		
 		printf("Nome > ");
 		scanf("%s", nome);
