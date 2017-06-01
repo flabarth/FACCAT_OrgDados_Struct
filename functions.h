@@ -13,6 +13,7 @@ void writes(char *s, int sizeofstring, FILE *f){
 	fwrite(s, sizeofstring, 1, f);
 }
 
+// Lê int do arquivo de dados
 int readi(int campo, FILE *f){
 	int resultado;
 	fread(&resultado, sizeof(campo), 1, f);
@@ -42,36 +43,32 @@ void insertNew(paciente p){
 	do{
 		
 		p.setAtivo(1);
-		writei(p.ativo, fout);
 		
 		printf("ID > ");
 		scanf("%d", &id);
 		p.setId(id);
-		writei(p.id, fout);
 		
 		getchar();
 		
 		printf("Nome > ");
 		scanf("%s", nome);
 		p.setNome(nome);
-		writes(p.nome, 45, fout);
 		
 		printf("Idade > ");
 		scanf("%d", &idade);
 		p.setIdade(idade);
-		writei(p.idade, fout);
 		
 		getchar();
 		
 		printf("Diagnóstico > ");
 		scanf("%s", diagnostico);
 		p.setDiagnostico(diagnostico);
-		writes(p.diagnostico, 200, fout);
 		
 		printf("Tratamento > ");
 		scanf("%s", tratamento);
 		p.setTratamento(tratamento);
-		writes(p.tratamento, 200, fout);
+
+		fwrite(&p, sizeof(struct paciente), 1, fout); // Escreve toda a estrutura no arquivo
 		
 		getchar();
 		
@@ -88,7 +85,7 @@ void insertNew(paciente p){
 
 void showAll(paciente p){
 	
-	int pacienteSize = p.pacienteSize;
+	int pacienteSize = sizeof(struct paciente);
 	int fileSize;
 	int numeroRegistros;
 	int registrosLidosComSucesso = 0;
@@ -110,25 +107,31 @@ void showAll(paciente p){
 		
 		for(int x = 1; x <= numeroRegistros; x++){
 			
-			int ativo = readi(p.ativo, fin); // Captura estado do registro (ativo ou não)
+			// Aqui controlamos quais registros podem ser lidos ou não.
+			// Primeiro lemos apenas o estado (ativo ou não). Desta forma
+			// carregamos apenas o campo "ativo" na memória. Se for ativo,
+			// lemos o registro inteiro, se não, apenas avançamos.
+			// Desta forma o registro não é carregado inteiramente na 
+			// memória, não havendo desperdicio.
+			
+			int ativo = readi(p.ativo, fin); // Captura APENAS estado do registro (ativo ou não)
+			fseek(fin, -sizeof(ativo), SEEK_CUR); // Volta para inicio do registro
 			
 			if(ativo == 1){ // Se for ativo, lê e mostra na tela
-			
-				printf("|%-5d|", readi(p.id, fin));
-				printf("%-13s|", reads(p.nome, 45, fin));
-				printf("%-6d|", readi(p.idade, fin));
-				printf("%-20s|", reads(p.diagnostico, 200, fin));
-				printf("%-20s|\n", reads(p.tratamento, 200, fin));
+
+				fread(&p, sizeof(struct paciente), 1, fin); // Lê registro inteiro
+				
+				printf("|%-5d|", p.id);
+				printf("%-13s|", p.nome);
+				printf("%-6d|", p.idade);
+				printf("%-20s|", p.diagnostico);
+				printf("%-20s|\n", p.tratamento);
 				
 				registrosLidosComSucesso++;
 				
 			}else{ // Se não for ativo...
-			
-				// Valor que avançaremos o ponteiro. Tamanho do registo menos o tamanho de ativo (pois já foi lido)
-				int valorParaAvancar = pacienteSize - sizeof(ativo);
 				
-				// Avança da posição atual + valor para avançar (avança um registro)
-				fseek(fin, valorParaAvancar, SEEK_CUR); // Move ponteiro para depois do valor apagado
+				fseek(fin, pacienteSize, SEEK_CUR); // Avança um registro
 				
 			}
 			
@@ -143,5 +146,58 @@ void showAll(paciente p){
 	}
 	
 	fclose(fin);
+	
+}
+
+// Deleta um registro baseado no ID
+void deleteReg(paciente p){
+	
+	FILE *f;
+	f = fopen("data.dat", "r+b"); // Abre arquivo de dados
+	int pacienteSize = sizeof(struct paciente);
+	int fileSize;
+	int numeroRegistros;
+	int idEx;
+	
+	fseek(f, 0L, SEEK_END); // Vai para fim do arquivo para medir tamanho
+	fileSize = ftell(f); // Tamanho total do arquivo
+	numeroRegistros = fileSize / pacienteSize; // Número de registros (tamanho total / tamanho do registro)
+	
+	rewind(f); // Volta ao início do arquivo
+	
+	printf("Digite o ID do paciente que deseja excluir > ");
+	scanf("%d", &idEx);
+	
+	for(int x = 1; x <= numeroRegistros; x++){ // Percorre todos os registros até encontrar o desejado
+		
+		// Aqui lemos o campo ativo, e só lemos o campo id também se o registro for ativo.
+		// No fim, não lemos o registro inteiro, apenas ativo e id (se for ativo).
+		
+		int ativo = readi(p.ativo, f); // Captura APENAS estado do registro (ativo ou não)
+		
+		if(ativo == 1){ // Se for ativo...
+		
+			int idCons = readi(p.id, f); // Captura ID do registro percorrido
+			
+			if(idCons == idEx){ // Testa se é igual ao ID desejado
+				// Se for...
+				fseek(f, -(sizeof(idCons) + sizeof(ativo)), SEEK_CUR); // Volta dois campos (ID e ativo), pois teremos que alterar ativo, que fica antes de ID
+				writei(0, f); // Já na posição do campo ativo, alteramos ele para 0
+				break; // Sai do loop, pois encontramos o que queríamos
+			}
+			
+			int valorParaAvancar = pacienteSize - (sizeof(ativo) + sizeof(idCons));
+			fseek(f, valorParaAvancar, SEEK_CUR); // Avanca para próximo registro
+			
+		}else{ // Se não for ativo...
+			
+			fseek(f, -sizeof(ativo), SEEK_CUR); // Volta para inicio do registro
+			fseek(f, pacienteSize, SEEK_CUR); // Avança um registro
+			
+		}
+		
+	}
+	
+	fclose(f); // Fecha arquivo
 	
 }
