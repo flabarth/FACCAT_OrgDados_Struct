@@ -10,7 +10,7 @@ int main(){
 	setlocale(LC_ALL,"");
 	
 	char escolha;
-	char database[20];
+	char database[40];
 
 	paciente pW; // Variável de escrita
 	paciente pR; // Variável de leitura
