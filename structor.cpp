@@ -18,7 +18,7 @@ int main(){
 	
 	do{
 		
-		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\ne[x]cluir\n[s]air\n>> ");
+		printf("\nVocê deseja:\n[i]ncluir\n[l]istar\ne[x]cluir\n[m]édia de idade\n[s]air\n>> ");
 		
 		escolha = getchar();
 		getchar(); // Char sobrando
@@ -31,6 +31,9 @@ int main(){
 				break;
 			case 'x': // excluir
 				deleteReg(pW);
+				break;
+			case 'm':
+				printf("\nA média de idade de todos os pacientes é: %.2f \n", mediaIdade(pR));
 				break;
 			case 's': // sair
 				break;
